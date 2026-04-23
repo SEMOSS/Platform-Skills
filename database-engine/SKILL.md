@@ -140,3 +140,15 @@ useEffect(() => {
     .then(({ pixelReturn }) => setDatabases(pixelReturn[0].output));
 }, []);
 ```
+
+### Common mistakes
+
+Don't use `actions.run()` from `useInsight()` with `encodeURIComponent` — always use `runPixel` from `@semoss/sdk` with `<encode>...</encode>` tags. The pixel runtime handles encoding; doing it at the JS layer can confuse the parser on characters like parentheses.
+
+```typescript
+// ❌ Wrong — JS-layer encoding, legacy hook API
+actions.run(`Database(database=["${DB_ID}"]) | Query("${encodeURIComponent(sql)}") | Collect(500);`)
+
+// ✅ Correct — pixel-layer encoding, documented API
+runPixel(`SqlQuery(database="${DB_ID}", query="<encode>${sql}</encode>", limit=500);`)
+```
